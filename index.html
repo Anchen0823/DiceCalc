@@ -9,22 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #0d0f12;
-      --bg-panel: #151a1f;
-      --bg-card: #1a2028;
-      --border: #2a3542;
-      --text: #e8e6e3;
-      --text-dim: #9ca3af;
-      --accent: #c9a227;
-      --accent-glow: #e8c547;
-      --success: #4ade80;
+      --bg-deep: #0b0e12;
+      --bg-panel: #121821;
+      --bg-card: #1a2330;
+      --bg-soft: #161e29;
+      --border: #2b3747;
+      --text: #e8edf4;
+      --text-dim: #98a4b6;
+      --accent: #63b3ff;
+      --accent-glow: #a6d4ff;
+      --success: #34d399;
       --fail: #f87171;
-      --d20-gold: #d4af37;
+      --warn: #fbbf24;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -33,322 +33,463 @@
       color: var(--text);
       font-family: 'Noto Serif SC', serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
       padding: 2rem;
       background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 162, 39, 0.08), transparent),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(74, 222, 128, 0.04), transparent);
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(99, 179, 255, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 95% 100%, rgba(52, 211, 153, 0.08), transparent);
+    }
+
+    .app-shell { width: min(1080px, 100%); }
+
+    .hero {
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
     h1 {
+      margin: 0;
       font-family: 'Cinzel', 'Noto Serif SC', serif;
-      font-weight: 700;
-      font-size: 1.75rem;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      margin: 0 0 0.25rem 0;
-      text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+      font-size: 2rem;
+      color: var(--accent-glow);
+      letter-spacing: 0.04em;
+      text-shadow: 0 0 18px rgba(166, 212, 255, 0.25);
     }
 
     .subtitle {
-      font-size: 0.9rem;
+      margin: 0;
       color: var(--text-dim);
-      margin-bottom: 2rem;
+      font-size: 0.95rem;
     }
 
     .panel {
-      background: var(--bg-panel);
+      background: linear-gradient(160deg, rgba(18, 24, 33, 0.95), rgba(20, 27, 36, 0.92));
       border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1rem;
+    }
+
+    .controls,
+    .results {
+      background: rgba(11, 14, 18, 0.38);
+      border: 1px solid rgba(43, 55, 71, 0.7);
       border-radius: 12px;
-      padding: 1.75rem 2rem;
-      min-width: 320px;
-      max-width: 420px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      padding: 1rem;
     }
 
     .row {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
     }
 
-    .row:last-of-type {
-      margin-bottom: 0;
+    .row:last-child { margin-bottom: 0; }
+
+    .row-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      color: var(--accent-glow);
+      font-size: 1rem;
     }
 
     label {
-      flex: 0 0 100px;
-      font-size: 0.95rem;
+      flex: 0 0 86px;
       color: var(--text-dim);
+      font-size: 0.9rem;
     }
 
-    select:not(.modifier-row select) {
+    select:not(.modifier-row select),
+    input[type="number"],
+    input[type="text"] {
       flex: 1;
       min-width: 0;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      padding: 0.62rem 0.8rem;
       color: var(--text);
       font-size: 1rem;
       font-family: inherit;
-      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    select:not(.modifier-row select):focus {
-      outline: none;
-      border-color: var(--accent);
-    }
+    select:not(.modifier-row select) { cursor: pointer; }
 
-    input[type="number"],
-    input[type="text"] {
-      flex: 1;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.6rem 0.9rem;
-      color: var(--text);
-      font-size: 1.1rem;
-      font-family: inherit;
-    }
-
+    select:focus,
     input[type="number"]:focus,
     input[type="text"]:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+      box-shadow: 0 0 0 2px rgba(99, 179, 255, 0.2);
     }
 
     .modifiers-section {
-      margin-top: 0.5rem;
+      margin-top: 0.2rem;
+      align-items: flex-start;
     }
 
     .modifiers-section .section-label {
-      font-size: 0.95rem;
+      margin-bottom: 0.55rem;
       color: var(--text-dim);
-      margin-bottom: 0.6rem;
+      font-size: 0.88rem;
+    }
+
+    .group-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .group-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-soft);
+      padding: 0.55rem;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .group-title {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      letter-spacing: 0.01em;
+    }
+
+    .group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-height: 34px;
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      width: 100%;
+    }
+
+    .mini-row .token {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.84rem;
+      padding: 0.42rem 0.55rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-row .mini-del {
+      flex: 0 0 30px;
+      height: 30px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-dim);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.2s;
+    }
+
+    .mini-row .mini-del:hover {
+      color: var(--fail);
+      border-color: var(--fail);
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .group-input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .group-input.dice-box {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .group-input.dice-box input {
+      width: 3.2em;
+      text-align: center;
+    }
+
+    .group-input.dice-box .d-sep {
+      color: var(--text-dim);
+      font-size: 0.86rem;
     }
 
     .modifier-row {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
+      gap: 0.45rem;
+      margin-bottom: 0.45rem;
     }
 
     .modifier-row select {
-      flex: 0 0 72px;
+      flex: 0 0 86px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 0.5rem 0.5rem;
+      padding: 0.45rem 0.4rem;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       font-family: inherit;
       cursor: pointer;
     }
 
-    .modifier-row .mod-input {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .modifier-row .mod-input input {
-      width: 100%;
-    }
+    .modifier-row .mod-input { flex: 1; min-width: 0; }
+    .modifier-row .mod-input input { width: 100%; }
 
     .modifier-row .btn-del {
-      flex: 0 0 32px;
-      height: 36px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      flex: 0 0 34px;
+      height: 34px;
       border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
       color: var(--text-dim);
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       line-height: 1;
       padding: 0;
-      transition: color 0.15s, border-color 0.15s;
+      transition: all 0.2s;
     }
 
     .modifier-row .btn-del:hover {
       color: var(--fail);
       border-color: var(--fail);
+      background: rgba(248, 113, 113, 0.08);
     }
 
     .btn-add-mod {
-      margin-top: 0.5rem;
       width: 100%;
-      padding: 0.5rem;
+      margin-top: 0.4rem;
+      padding: 0.52rem 0.6rem;
       background: var(--bg-card);
       border: 1px dashed var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--text-dim);
       font-size: 0.9rem;
       font-family: inherit;
       cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
+      transition: all 0.2s;
     }
 
     .btn-add-mod:hover {
-      color: var(--accent);
+      color: var(--accent-glow);
       border-color: var(--accent);
-    }
-
-    .d20-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(145deg, #2a2520, #1a1510);
-      border: 1px solid var(--d20-gold);
-      border-radius: 8px;
-      color: var(--d20-gold);
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      font-size: 1.25rem;
+      background: rgba(99, 179, 255, 0.08);
     }
 
     .results {
-      margin-top: 1.75rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.85rem;
     }
 
     .result-main {
-      font-size: 1.5rem;
-      font-weight: 700;
       text-align: center;
-      margin-bottom: 1rem;
+      background: linear-gradient(180deg, rgba(28, 38, 51, 0.9), rgba(21, 29, 39, 0.85));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-size: 1.06rem;
     }
 
     .result-main .pct {
       color: var(--accent-glow);
+      display: block;
+      margin-top: 0.2rem;
       font-family: 'Cinzel', serif;
-      letter-spacing: 0.05em;
+      font-size: 2.1rem;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
     }
 
     .result-detail {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      font-size: 0.9rem;
+      gap: 0.55rem;
     }
 
-    .result-detail span {
-      display: block;
+    .stat {
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 10px;
+      padding: 0.55rem 0.65rem;
+      min-height: 68px;
+    }
+
+    .stat .name {
       color: var(--text-dim);
+      font-size: 0.8rem;
+      display: block;
+      margin-bottom: 0.2rem;
     }
 
-    .result-detail .value {
+    .stat .value {
       color: var(--text);
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
     }
 
-    .result-detail .crit-success .value { color: var(--success); }
-    .result-detail .crit-fail .value { color: var(--fail); }
+    .stat.crit-success .value { color: var(--success); }
+    .stat.crit-fail .value { color: var(--fail); }
+    .stat.normal-success .value { color: var(--accent-glow); }
+    .stat.normal-fail .value { color: var(--warn); }
 
     .rule-hint {
-      margin-top: 1.25rem;
-      padding: 0.75rem 1rem;
-      background: var(--bg-card);
-      border-radius: 8px;
-      border-left: 3px solid var(--accent);
-      font-size: 0.85rem;
+      margin-top: 0.95rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(26, 35, 48, 0.6);
       color: var(--text-dim);
+      font-size: 0.82rem;
+      line-height: 1.5;
     }
 
-    .rule-hint strong {
-      color: var(--text);
-    }
+    .rule-hint strong { color: var(--text); }
 
     footer {
-      margin-top: 2rem;
-      font-size: 0.8rem;
+      margin-top: 1rem;
+      text-align: center;
       color: var(--text-dim);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 960px) {
+      .panel { grid-template-columns: 1fr; }
+      .hero { display: block; }
+      .subtitle { margin-top: 0.35rem; }
     }
   </style>
 </head>
 <body>
-  <h1>D20 检定概率</h1>
-  <p class="subtitle">博德之门3 · 1d20 成功/失败概率</p>
-
-  <div class="panel">
-    <div class="row">
-      <span class="d20-badge">d20</span>
-      <label for="target">检定难度 DC</label>
-      <input type="number" id="target" min="1" max="30" value="15" placeholder="目标值">
-    </div>
-    <div class="row">
-      <label for="advantage">检定方式</label>
-      <select id="advantage">
-        <option value="normal">普通（1d20）</option>
-        <option value="advantage">优势（2d20 取高）</option>
-        <option value="disadvantage">劣势（2d20 取低）</option>
-      </select>
-    </div>
-    <div class="row modifiers-section">
-      <div style="flex: 1; min-width: 0;">
-        <div class="section-label">加值（可多个：固定值或骰子，骰子为数量 d 面数）</div>
-        <div id="modifierList"></div>
-        <button type="button" class="btn-add-mod" id="btnAddMod">+ 添加加值</button>
-      </div>
+  <div class="app-shell">
+    <div class="hero">
+      <h1>🎲 D20 检定计算器</h1>
+      <p class="subtitle">博德之门3 · 电脑端简洁布局</p>
     </div>
 
-    <div class="results">
-      <div class="result-main">
-        成功概率：<span class="pct" id="pct">50%</span>
-      </div>
-      <div class="result-detail">
-        <div class="result-detail crit-success">
-          <span>大成功 (20)</span>
-          <span class="value" id="critSuccess">5%</span>
+    <div class="panel">
+      <div class="controls">
+        <div class="row">
+          <span class="row-icon">🎯</span>
+          <label for="target">DC 目标</label>
+          <input type="number" id="target" min="1" max="99" value="15" placeholder="输入 DC">
         </div>
-        <div class="result-detail crit-fail">
-          <span>大失败 (1)</span>
-          <span class="value" id="critFail">5%</span>
+        <div class="row modifiers-section">
+          <span class="row-icon">🧩</span>
+          <div style="flex: 1; min-width: 0;">
+            <div class="section-label">添加项（优势/劣势最多各 1 个）</div>
+            <div class="group-grid">
+              <div class="group-card">
+                <div class="group-title">⬆️ 优势</div>
+                <div class="group-list" id="advList"></div>
+                <button type="button" class="btn-add-mod" id="btnAddAdv">➕ 添加优势</button>
+              </div>
+              <div class="group-card">
+                <div class="group-title">⬇️ 劣势</div>
+                <div class="group-list" id="disList"></div>
+                <button type="button" class="btn-add-mod" id="btnAddDis">➕ 添加劣势</button>
+              </div>
+              <div class="group-card">
+                <div class="group-title">🔢 固定加值</div>
+                <div class="group-list" id="fixedList"></div>
+                <button type="button" class="btn-add-mod" id="btnAddFixed">➕ 添加固定</button>
+              </div>
+              <div class="group-card">
+                <div class="group-title">🎲 骰子加值</div>
+                <div class="group-list" id="diceList"></div>
+                <button type="button" class="btn-add-mod" id="btnAddDice">➕ 添加骰子</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <div class="result-main">
+          🏆 成功率
+          <span class="pct" id="pct">50%</span>
         </div>
         <div class="result-detail">
-          <span>普通成功</span>
-          <span class="value" id="normalSuccess">—</span>
+          <div class="stat crit-success">
+            <span class="name">✨ 大成功 (20)</span>
+            <span class="value" id="critSuccess">5%</span>
+          </div>
+          <div class="stat crit-fail">
+            <span class="name">💥 大失败 (1)</span>
+            <span class="value" id="critFail">5%</span>
+          </div>
+          <div class="stat normal-success">
+            <span class="name">✅ 普通成功</span>
+            <span class="value" id="normalSuccess">—</span>
+          </div>
+          <div class="stat normal-fail">
+            <span class="name">❌ 普通失败</span>
+            <span class="value" id="normalFail">—</span>
+          </div>
         </div>
-        <div class="result-detail">
-          <span>普通失败</span>
-          <span class="value" id="normalFail">—</span>
+        <div class="rule-hint">
+          <strong>📘 规则：</strong> 1=必败，20=必胜；其余 2-19 需满足
+          <strong>d20 + 全部加值 ≥ DC</strong>。优势取高，劣势取低；若优势与劣势同时存在，按普通模式计算。
         </div>
       </div>
     </div>
 
-    <div class="rule-hint">
-      <strong>规则：</strong> 掷出 1 视为大失败（必败），掷出 20 视为大成功（必胜）；其余 2–19 与全部加值之和 ≥ DC 则成功。优势 = 掷 2d20 取高，劣势 = 掷 2d20 取低。
-    </div>
+    <footer>DiceCalc · 1d20 检定 · 图标化简洁界面</footer>
   </div>
-
-  <footer>DiceCalc · 1d20 检定 · 1=大失败 20=大成功</footer>
 
   <script>
     const targetInput = document.getElementById('target');
-    const advantageSelect = document.getElementById('advantage');
-    const modifierListEl = document.getElementById('modifierList');
-    const btnAddMod = document.getElementById('btnAddMod');
+    const advListEl = document.getElementById('advList');
+    const disListEl = document.getElementById('disList');
+    const fixedListEl = document.getElementById('fixedList');
+    const diceListEl = document.getElementById('diceList');
+    const btnAddAdv = document.getElementById('btnAddAdv');
+    const btnAddDis = document.getElementById('btnAddDis');
+    const btnAddFixed = document.getElementById('btnAddFixed');
+    const btnAddDice = document.getElementById('btnAddDice');
     const pctEl = document.getElementById('pct');
     const critSuccessEl = document.getElementById('critSuccess');
     const critFailEl = document.getElementById('critFail');
     const normalSuccessEl = document.getElementById('normalSuccess');
     const normalFailEl = document.getElementById('normalFail');
 
-    // 加值列表：{ id, type: 'fixed'|'dice', value }，value 固定为数字，骰子为 "1d4" 等字符串
-    let modifiers = [];
     let nextId = 1;
+    let advantages = [];
+    let disadvantages = [];
+    let fixedModifiers = [];
+    let diceModifiers = [];
 
     function clampTarget(v) {
       const n = parseInt(v, 10);
       if (Number.isNaN(n)) return 15;
-      return Math.max(1, Math.min(30, n));
+      return Math.max(1, Math.min(99, n));
     }
 
     /** 单组骰子 nds 的分布：Map<sum, prob> */
@@ -380,20 +521,19 @@
       return out;
     }
 
-    /** 从加值列表得到：固定和 + 骰子和的分布。骰子用 count、sides。 */
+    /** 从加值列表得到：固定和 + 骰子和的分布。 */
     function getModifierDistribution() {
       let fixedSum = 0;
       let diceDist = null;
-      for (const m of modifiers) {
-        if (m.type === 'fixed') {
-          const v = parseInt(m.value, 10);
-          if (!Number.isNaN(v)) fixedSum += v;
-        } else if (m.type === 'dice') {
-          const count = Math.max(1, Math.min(20, parseInt(m.count, 10) || 1));
-          const sides = Math.max(2, Math.min(100, parseInt(m.sides, 10) || 4));
-          const d = diceDistribution(count, sides);
-          diceDist = diceDist ? convolve(diceDist, d) : d;
-        }
+      for (const m of fixedModifiers) {
+        const v = parseInt(m.value, 10);
+        if (!Number.isNaN(v)) fixedSum += v;
+      }
+      for (const m of diceModifiers) {
+        const count = Math.max(1, Math.min(20, parseInt(m.count, 10) || 1));
+        const sides = Math.max(2, Math.min(100, parseInt(m.sides, 10) || 4));
+        const d = diceDistribution(count, sides);
+        diceDist = diceDist ? convolve(diceDist, d) : d;
       }
       return { fixedSum, diceDist };
     }
@@ -420,14 +560,12 @@
         return dist;
       }
       if (mode === 'advantage') {
-        // P(max = 1) = 1/400, P(max = 20) = 1 - (19/20)^2 = 39/400, P(max = k) = (2k-1)/400
         dist.set(1, 1 / 400);
         dist.set(20, 39 / 400);
         for (let k = 2; k <= 19; k++) dist.set(k, (2 * k - 1) / 400);
         return dist;
       }
       if (mode === 'disadvantage') {
-        // P(min = 1) = 39/400, P(min = 20) = 1/400, P(min = k) = (41-2k)/400
         dist.set(1, 39 / 400);
         dist.set(20, 1 / 400);
         for (let k = 2; k <= 19; k++) dist.set(k, (41 - 2 * k) / 400);
@@ -435,6 +573,15 @@
       }
       for (let k = 1; k <= 20; k++) dist.set(k, 1 / 20);
       return dist;
+    }
+
+    function getRollMode() {
+      const hasAdv = advantages.length > 0;
+      const hasDis = disadvantages.length > 0;
+      if (hasAdv && hasDis) return 'normal';
+      if (hasAdv) return 'advantage';
+      if (hasDis) return 'disadvantage';
+      return 'normal';
     }
 
     /**
@@ -451,144 +598,164 @@
       }
       const pNormalFail = 1 - pCritFail - pCritSuccess - pNormalSuccess;
       const pSuccess = pCritSuccess + pNormalSuccess;
-      return {
-        pSuccess,
-        pCritFail,
-        pCritSuccess,
-        pNormalSuccess,
-        pNormalFail,
-      };
+      return { pSuccess, pCritFail, pCritSuccess, pNormalSuccess, pNormalFail };
     }
 
     function formatPct(p) {
-      return (p * 100).toFixed(1).replace(/\.0$/, '') + '%';
+      return (p * 100).toFixed(2).replace(/\.?0+$/, '') + '%';
     }
 
-    function renderModifierRow(mod) {
-      const row = document.createElement('div');
-      row.className = 'modifier-row';
-      row.dataset.id = String(mod.id);
-
-      const sel = document.createElement('select');
-      sel.innerHTML = '<option value="fixed">固定值</option><option value="dice">骰子</option>';
-      sel.value = mod.type;
-
-      const wrap = document.createElement('div');
-      wrap.className = 'mod-input';
-      wrap.style.display = 'flex';
-      wrap.style.gap = '0.5rem';
-      wrap.style.alignItems = 'center';
-
-      let inpFixed, inpCount, inpSides, diceBox;
-
-      function showFixed() {
-        wrap.innerHTML = '';
-        inpFixed = document.createElement('input');
-        inpFixed.type = 'number';
-        inpFixed.placeholder = '如 5、-2';
-        inpFixed.value = mod.value ?? '0';
-        inpFixed.addEventListener('input', () => { mod.value = inpFixed.value; update(); });
-        inpFixed.addEventListener('change', () => { mod.value = inpFixed.value; update(); });
-        wrap.appendChild(inpFixed);
-      }
-
-      function showDice() {
-        wrap.innerHTML = '';
-        diceBox = document.createElement('span');
-        diceBox.style.display = 'flex';
-        diceBox.style.alignItems = 'center';
-        diceBox.style.gap = '0.25rem';
-        inpCount = document.createElement('input');
-        inpCount.type = 'number';
-        inpCount.min = 1;
-        inpCount.max = 20;
-        inpCount.style.width = '3.5em';
-        inpCount.value = (mod.count != null ? mod.count : 1);
-        inpSides = document.createElement('input');
-        inpSides.type = 'number';
-        inpSides.min = 2;
-        inpSides.max = 100;
-        inpSides.style.width = '3.5em';
-        inpSides.value = (mod.sides != null ? mod.sides : 4);
-        const dLabel = document.createElement('span');
-        dLabel.textContent = 'd';
-        dLabel.style.color = 'var(--text-dim)';
-        diceBox.appendChild(inpCount);
-        diceBox.appendChild(dLabel);
-        diceBox.appendChild(inpSides);
-        wrap.appendChild(diceBox);
-        function sync() {
-          mod.count = inpCount.value;
-          mod.sides = inpSides.value;
-          update();
-        }
-        inpCount.addEventListener('input', sync);
-        inpCount.addEventListener('change', sync);
-        inpSides.addEventListener('input', sync);
-        inpSides.addEventListener('change', sync);
-      }
-
-      sel.addEventListener('change', () => {
-        mod.type = sel.value;
-        if (mod.type === 'fixed') {
-          mod.value = mod.value ?? '0';
-          showFixed();
-        } else {
-          if (mod.count == null) mod.count = 1;
-          if (mod.sides == null) mod.sides = 4;
-          showDice();
-        }
-        update();
-      });
-
-      if (mod.type === 'fixed') {
-        showFixed();
-      } else {
-        if (mod.count == null) mod.count = 1;
-        if (mod.sides == null) mod.sides = 4;
-        showDice();
-      }
-
+    function makeDeleteButton(onClick, title = '删除') {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn-del';
-      btn.textContent = '×';
-      btn.title = '删除';
-      btn.addEventListener('click', () => {
-        modifiers = modifiers.filter(m => m.id !== mod.id);
-        renderModifierList();
+      btn.className = 'mini-del';
+      btn.textContent = '🗑';
+      btn.title = title;
+      btn.addEventListener('click', onClick);
+      return btn;
+    }
+
+    function renderAdvDisList(listEl, data, kind) {
+      listEl.innerHTML = '';
+      if (data.length === 0) return;
+      const item = data[0];
+      const row = document.createElement('div');
+      row.className = 'mini-row';
+      const token = document.createElement('div');
+      token.className = 'token';
+      token.textContent = kind === 'adv' ? '已添加：优势' : '已添加：劣势';
+      row.appendChild(token);
+      row.appendChild(makeDeleteButton(() => {
+        if (kind === 'adv') {
+          advantages = [];
+          renderAdvDisList(advListEl, advantages, 'adv');
+          syncAdvDisButtons();
+        } else {
+          disadvantages = [];
+          renderAdvDisList(disListEl, disadvantages, 'dis');
+          syncAdvDisButtons();
+        }
         update();
+      }, '删除该项'));
+      listEl.appendChild(row);
+    }
+
+    function renderFixedList() {
+      fixedListEl.innerHTML = '';
+      fixedModifiers.forEach((mod) => {
+        const row = document.createElement('div');
+        row.className = 'mini-row';
+        const input = document.createElement('input');
+        input.className = 'group-input';
+        input.type = 'number';
+        input.placeholder = '例如 +5 / -2';
+        input.value = mod.value ?? '0';
+        input.addEventListener('input', () => { mod.value = input.value; update(); });
+        input.addEventListener('change', () => { mod.value = input.value; update(); });
+        row.appendChild(input);
+        row.appendChild(makeDeleteButton(() => {
+          fixedModifiers = fixedModifiers.filter(m => m.id !== mod.id);
+          renderFixedList();
+          update();
+        }, '删除固定加值'));
+        fixedListEl.appendChild(row);
       });
-
-      row.appendChild(sel);
-      row.appendChild(wrap);
-      row.appendChild(btn);
-      return row;
     }
 
-    function renderModifierList() {
-      modifierListEl.innerHTML = '';
-      modifiers.forEach(m => modifierListEl.appendChild(renderModifierRow(m)));
+    function renderDiceList() {
+      diceListEl.innerHTML = '';
+      diceModifiers.forEach((mod) => {
+        const row = document.createElement('div');
+        row.className = 'mini-row';
+        const box = document.createElement('div');
+        box.className = 'group-input dice-box';
+
+        const countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.min = 1;
+        countInput.max = 20;
+        countInput.value = mod.count != null ? mod.count : 1;
+
+        const dSep = document.createElement('span');
+        dSep.className = 'd-sep';
+        dSep.textContent = 'd';
+
+        const sidesInput = document.createElement('input');
+        sidesInput.type = 'number';
+        sidesInput.min = 2;
+        sidesInput.max = 100;
+        sidesInput.value = mod.sides != null ? mod.sides : 4;
+
+        const sync = () => {
+          mod.count = countInput.value;
+          mod.sides = sidesInput.value;
+          update();
+        };
+        countInput.addEventListener('input', sync);
+        countInput.addEventListener('change', sync);
+        sidesInput.addEventListener('input', sync);
+        sidesInput.addEventListener('change', sync);
+
+        box.appendChild(countInput);
+        box.appendChild(dSep);
+        box.appendChild(sidesInput);
+        row.appendChild(box);
+        row.appendChild(makeDeleteButton(() => {
+          diceModifiers = diceModifiers.filter(m => m.id !== mod.id);
+          renderDiceList();
+          update();
+        }, '删除骰子加值'));
+        diceListEl.appendChild(row);
+      });
     }
 
-    function addModifier(type = 'fixed') {
-      if (type === 'dice') {
-        modifiers.push({ id: nextId++, type: 'dice', count: 1, sides: 4 });
-      } else {
-        modifiers.push({ id: nextId++, type: 'fixed', value: '0' });
-      }
-      renderModifierList();
+    function syncAdvDisButtons() {
+      btnAddAdv.disabled = advantages.length >= 1;
+      btnAddDis.disabled = disadvantages.length >= 1;
+      btnAddAdv.textContent = advantages.length >= 1 ? '✅ 已有优势' : '➕ 添加优势';
+      btnAddDis.textContent = disadvantages.length >= 1 ? '✅ 已有劣势' : '➕ 添加劣势';
+    }
+
+    function renderAllLists() {
+      renderAdvDisList(advListEl, advantages, 'adv');
+      renderAdvDisList(disListEl, disadvantages, 'dis');
+      renderFixedList();
+      renderDiceList();
+      syncAdvDisButtons();
+    }
+
+    function addAdvantage() {
+      if (advantages.length >= 1) return;
+      advantages.push({ id: nextId++ });
+      renderAllLists();
       update();
     }
 
-    btnAddMod.addEventListener('click', () => addModifier());
+    function addDisadvantage() {
+      if (disadvantages.length >= 1) return;
+      disadvantages.push({ id: nextId++ });
+      renderAllLists();
+      update();
+    }
+
+    function addFixedModifier() {
+      fixedModifiers.push({ id: nextId++, value: '0' });
+      renderFixedList();
+      update();
+    }
+
+    function addDiceModifier() {
+      diceModifiers.push({ id: nextId++, count: 1, sides: 4 });
+      renderDiceList();
+      update();
+    }
 
     function update() {
       const target = clampTarget(targetInput.value);
       targetInput.value = target;
-
+      const mode = getRollMode();
       const { fixedSum, diceDist } = getModifierDistribution();
-      const d20Dist = getD20RollDistribution(advantageSelect.value);
+      const d20Dist = getD20RollDistribution(mode);
       const r = compute(target, fixedSum, diceDist, d20Dist);
 
       pctEl.textContent = formatPct(r.pSuccess);
@@ -600,10 +767,12 @@
 
     targetInput.addEventListener('input', update);
     targetInput.addEventListener('change', update);
-    advantageSelect.addEventListener('change', update);
+    btnAddAdv.addEventListener('click', addAdvantage);
+    btnAddDis.addEventListener('click', addDisadvantage);
+    btnAddFixed.addEventListener('click', addFixedModifier);
+    btnAddDice.addEventListener('click', addDiceModifier);
 
-    // 初始无加值，可选：预填一个示例
-    renderModifierList();
+    renderAllLists();
     update();
   </script>
 </body>
