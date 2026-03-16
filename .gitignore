@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# 构建与输出
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# 环境与 IDE
+.env
+.env.local
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 日志与临时
+*.log
+*.tmp
+.cache/
