@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>博德之门3 · 检定概率计算器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0d0f12;
+      --bg-panel: #151a1f;
+      --bg-card: #1a2028;
+      --border: #2a3542;
+      --text: #e8e6e3;
+      --text-dim: #9ca3af;
+      --accent: #c9a227;
+      --accent-glow: #e8c547;
+      --success: #4ade80;
+      --fail: #f87171;
+      --d20-gold: #d4af37;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: 'Noto Serif SC', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 162, 39, 0.08), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(74, 222, 128, 0.04), transparent);
+    }
+
+    h1 {
+      font-family: 'Cinzel', 'Noto Serif SC', serif;
+      font-weight: 700;
+      font-size: 1.75rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 0 0 0.25rem 0;
+      text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      min-width: 320px;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .row:last-of-type {
+      margin-bottom: 0;
+    }
+
+    label {
+      flex: 0 0 100px;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+    }
+
+    input[type="number"] {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      color: var(--text);
+      font-size: 1.1rem;
+      font-family: inherit;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+    }
+
+    .d20-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(145deg, #2a2520, #1a1510);
+      border: 1px solid var(--d20-gold);
+      border-radius: 8px;
+      color: var(--d20-gold);
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .results {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .result-main {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .result-main .pct {
+      color: var(--accent-glow);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.05em;
+    }
+
+    .result-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .result-detail span {
+      display: block;
+      color: var(--text-dim);
+    }
+
+    .result-detail .value {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .result-detail .crit-success .value { color: var(--success); }
+    .result-detail .crit-fail .value { color: var(--fail); }
+
+    .rule-hint {
+      margin-top: 1.25rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .rule-hint strong {
+      color: var(--text);
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <h1>D20 检定概率</h1>
+  <p class="subtitle">博德之门3 · 1d20 成功/失败概率</p>
+
+  <div class="panel">
+    <div class="row">
+      <span class="d20-badge">d20</span>
+      <label for="target">检定难度 DC</label>
+      <input type="number" id="target" min="1" max="30" value="15" placeholder="目标值">
+    </div>
+    <div class="row">
+      <label for="mod">加值（可选）</label>
+      <input type="number" id="mod" min="-20" max="30" value="0" placeholder="如 +5">
+    </div>
+
+    <div class="results">
+      <div class="result-main">
+        成功概率：<span class="pct" id="pct">50%</span>
+      </div>
+      <div class="result-detail">
+        <div class="result-detail crit-success">
+          <span>大成功 (20)</span>
+          <span class="value" id="critSuccess">5%</span>
+        </div>
+        <div class="result-detail crit-fail">
+          <span>大失败 (1)</span>
+          <span class="value" id="critFail">5%</span>
+        </div>
+        <div class="result-detail">
+          <span>普通成功</span>
+          <span class="value" id="normalSuccess">—</span>
+        </div>
+        <div class="result-detail">
+          <span>普通失败</span>
+          <span class="value" id="normalFail">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-hint">
+      <strong>规则：</strong> 掷出 1 视为大失败（必败），掷出 20 视为大成功（必胜）；其余 2–19 与加值之和 ≥ DC 则成功。
+    </div>
+  </div>
+
+  <footer>DiceCalc · 1d20 检定 · 1=大失败 20=大成功</footer>
+
+  <script>
+    const targetInput = document.getElementById('target');
+    const modInput = document.getElementById('mod');
+    const pctEl = document.getElementById('pct');
+    const critSuccessEl = document.getElementById('critSuccess');
+    const critFailEl = document.getElementById('critFail');
+    const normalSuccessEl = document.getElementById('normalSuccess');
+    const normalFailEl = document.getElementById('normalFail');
+
+    function clampTarget(v) {
+      const n = parseInt(v, 10);
+      if (Number.isNaN(n)) return 15;
+      return Math.max(1, Math.min(30, n));
+    }
+
+    function clampMod(v) {
+      const n = parseInt(v, 10);
+      if (Number.isNaN(n)) return 0;
+      return Math.max(-20, Math.min(30, n));
+    }
+
+    /**
+     * BG3 规则：1d20 + 加值 vs DC
+     * - 自然 1：大失败（必败）
+     * - 自然 20：大成功（必胜）
+     * - 2–19：骰值 + 加值 >= DC 则成功
+     */
+    function compute(target, mod) {
+      const pCritFail = 1 / 20;
+      const pCritSuccess = 1 / 20;
+      let normalSuccessCount = 0;
+      for (let roll = 2; roll <= 19; roll++) {
+        if (roll + mod >= target) normalSuccessCount++;
+      }
+      const pNormalSuccess = normalSuccessCount / 20;
+      const pNormalFail = (18 - normalSuccessCount) / 20;
+      const pSuccess = pCritSuccess + pNormalSuccess;
+      return {
+        pSuccess,
+        pCritFail,
+        pCritSuccess,
+        pNormalSuccess,
+        pNormalFail,
+      };
+    }
+
+    function formatPct(p) {
+      return (p * 100).toFixed(1).replace(/\.0$/, '') + '%';
+    }
+
+    function update() {
+      const target = clampTarget(targetInput.value);
+      const mod = clampMod(modInput.value);
+      targetInput.value = target;
+      modInput.value = mod;
+
+      const r = compute(target, mod);
+      pctEl.textContent = formatPct(r.pSuccess);
+      critSuccessEl.textContent = formatPct(r.pCritSuccess);
+      critFailEl.textContent = formatPct(r.pCritFail);
+      normalSuccessEl.textContent = formatPct(r.pNormalSuccess);
+      normalFailEl.textContent = formatPct(r.pNormalFail);
+    }
+
+    targetInput.addEventListener('input', update);
+    targetInput.addEventListener('change', update);
+    modInput.addEventListener('input', update);
+    modInput.addEventListener('change', update);
+
+    update();
+  </script>
+</body>
+</html>
