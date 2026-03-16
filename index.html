@@ -85,6 +85,24 @@
       color: var(--text-dim);
     }
 
+    select:not(.modifier-row select) {
+      flex: 1;
+      min-width: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    select:not(.modifier-row select):focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
     input[type="number"],
     input[type="text"] {
       flex: 1;
@@ -265,6 +283,14 @@
       <label for="target">检定难度 DC</label>
       <input type="number" id="target" min="1" max="30" value="15" placeholder="目标值">
     </div>
+    <div class="row">
+      <label for="advantage">检定方式</label>
+      <select id="advantage">
+        <option value="normal">普通（1d20）</option>
+        <option value="advantage">优势（2d20 取高）</option>
+        <option value="disadvantage">劣势（2d20 取低）</option>
+      </select>
+    </div>
     <div class="row modifiers-section">
       <div style="flex: 1; min-width: 0;">
         <div class="section-label">加值（可多个：固定值或骰子，骰子为数量 d 面数）</div>
@@ -298,7 +324,7 @@
     </div>
 
     <div class="rule-hint">
-      <strong>规则：</strong> 掷出 1 视为大失败（必败），掷出 20 视为大成功（必胜）；其余 2–19 与全部加值（固定值 + 骰子如 1d4）之和 ≥ DC 则成功。
+      <strong>规则：</strong> 掷出 1 视为大失败（必败），掷出 20 视为大成功（必胜）；其余 2–19 与全部加值之和 ≥ DC 则成功。优势 = 掷 2d20 取高，劣势 = 掷 2d20 取低。
     </div>
   </div>
 
@@ -306,6 +332,7 @@
 
   <script>
     const targetInput = document.getElementById('target');
+    const advantageSelect = document.getElementById('advantage');
     const modifierListEl = document.getElementById('modifierList');
     const btnAddMod = document.getElementById('btnAddMod');
     const pctEl = document.getElementById('pct');
@@ -382,17 +409,47 @@
     }
 
     /**
-     * BG3 规则：1d20 + 加值 vs DC。加值 = 固定和 + 骰子和（分布）
+     * 根据检定方式返回 d20 有效结果的概率分布：Map<1..20, prob>
+     * 普通：均匀 1/20；优势：2d20 取高；劣势：2d20 取低
      */
-    function compute(target, fixedSum, diceDist) {
-      const pCritFail = 1 / 20;
-      const pCritSuccess = 1 / 20;
+    function getD20RollDistribution(mode) {
+      const dist = new Map();
+      for (let k = 1; k <= 20; k++) dist.set(k, 0);
+      if (mode === 'normal') {
+        for (let k = 1; k <= 20; k++) dist.set(k, 1 / 20);
+        return dist;
+      }
+      if (mode === 'advantage') {
+        // P(max = 1) = 1/400, P(max = 20) = 1 - (19/20)^2 = 39/400, P(max = k) = (2k-1)/400
+        dist.set(1, 1 / 400);
+        dist.set(20, 39 / 400);
+        for (let k = 2; k <= 19; k++) dist.set(k, (2 * k - 1) / 400);
+        return dist;
+      }
+      if (mode === 'disadvantage') {
+        // P(min = 1) = 39/400, P(min = 20) = 1/400, P(min = k) = (41-2k)/400
+        dist.set(1, 39 / 400);
+        dist.set(20, 1 / 400);
+        for (let k = 2; k <= 19; k++) dist.set(k, (41 - 2 * k) / 400);
+        return dist;
+      }
+      for (let k = 1; k <= 20; k++) dist.set(k, 1 / 20);
+      return dist;
+    }
+
+    /**
+     * BG3 规则：d20 有效结果 + 加值 vs DC。加值 = 固定和 + 骰子和（分布）
+     * d20Dist: Map<1..20, prob>，由普通/优势/劣势决定
+     */
+    function compute(target, fixedSum, diceDist, d20Dist) {
+      const pCritFail = d20Dist.get(1) || 0;
+      const pCritSuccess = d20Dist.get(20) || 0;
       let pNormalSuccess = 0;
       for (let roll = 2; roll <= 19; roll++) {
-        const need = target - roll - fixedSum; // 需要 diceSum >= need
-        pNormalSuccess += (1 / 20) * pDiceSumAtLeast(diceDist, need);
+        const need = target - roll - fixedSum;
+        pNormalSuccess += (d20Dist.get(roll) || 0) * pDiceSumAtLeast(diceDist, need);
       }
-      const pNormalFail = 18 / 20 - pNormalSuccess;
+      const pNormalFail = 1 - pCritFail - pCritSuccess - pNormalSuccess;
       const pSuccess = pCritSuccess + pNormalSuccess;
       return {
         pSuccess,
@@ -531,7 +588,8 @@
       targetInput.value = target;
 
       const { fixedSum, diceDist } = getModifierDistribution();
-      const r = compute(target, fixedSum, diceDist);
+      const d20Dist = getD20RollDistribution(advantageSelect.value);
+      const r = compute(target, fixedSum, diceDist, d20Dist);
 
       pctEl.textContent = formatPct(r.pSuccess);
       critSuccessEl.textContent = formatPct(r.pCritSuccess);
@@ -542,6 +600,7 @@
 
     targetInput.addEventListener('input', update);
     targetInput.addEventListener('change', update);
+    advantageSelect.addEventListener('change', update);
 
     // 初始无加值，可选：预填一个示例
     renderModifierList();
